@@ -6,21 +6,19 @@ import com.ferhat.springmongodemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class UserController {
 
+    @Autowired
     private UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping("/addUser")
     public void addUser(@RequestBody User user) {
         userService.addUser(user);
     }
-
 
     @GetMapping("/getUser")
     public void getUser(@RequestParam(value = "userId") Long id) {
@@ -40,5 +38,20 @@ public class UserController {
     @GetMapping("/getAllUsers")
     public void getAllUsers() {
         userService.getAllUsers();
+    }
+
+    @PostMapping("/addUsers")
+    public void addUsers(@RequestBody List<User> users) {
+        userService.addUsers(users);
+    }
+
+    @DeleteMapping("/deleteAllUsers")
+    public void deleteAllUsers() {
+        userService.deleteAllusers();
+    }
+
+    @GetMapping("/getUserName")
+    public void getUserName(@RequestParam(value = "userFirstName") String name) {
+        userService.getUserName(name);
     }
 }

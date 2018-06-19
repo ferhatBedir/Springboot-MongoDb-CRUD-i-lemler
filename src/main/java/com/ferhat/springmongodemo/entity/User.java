@@ -1,14 +1,25 @@
 package com.ferhat.springmongodemo.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.lang.Nullable;
+
+import javax.validation.constraints.Size;
 
 public class User {
 
     @Id
     private Long userId;
+
+    @Size(max = 40, min = 3)
     private String userFirstName;
+
+    @Size(max = 40, min = 3)
     private String userLastName;
+
+    @Size(max = 40, min = 3)
     private String userEmail;
+
+    @Size(max = 40, min = 2)
     private String userDepartmentName;
 
 

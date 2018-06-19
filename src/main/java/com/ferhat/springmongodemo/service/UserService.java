@@ -5,18 +5,13 @@ import com.ferhat.springmongodemo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
-
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
     public void addUser(User user) {
         User user1 = userRepository.findOneByUserId(user.getUserId());
@@ -86,14 +81,52 @@ public class UserService {
     public void getAllUsers() {
         List<User> users = userRepository.findAll();
         System.out.println("Kayıtlı Kişi Listesi");
-        for (User s : users) {
-            System.out.println("******************************************");
-            System.out.println("Kişi Bilgileri");
-            System.out.println("User Id --> " + s.getUserId());
-            System.out.println("User Name --> " + s.getUserFirstName());
-            System.out.println("User Surname --> " + s.getUserLastName());
-            System.out.println("User Email --> " + s.getUserEmail());
-            System.out.println("User Department Name --> " + s.getUserDepartmentName());
+        if (users.size() == 0) {
+            System.out.println("Db'ye kayıtlı kişi yok..");
+        } else {
+            for (User s : users) {
+                System.out.println("******************************************");
+                System.out.println("Kişi Bilgileri");
+                System.out.println("User Id --> " + s.getUserId());
+                System.out.println("User Name --> " + s.getUserFirstName());
+                System.out.println("User Surname --> " + s.getUserLastName());
+                System.out.println("User Email --> " + s.getUserEmail());
+                System.out.println("User Department Name --> " + s.getUserDepartmentName());
+            }
         }
+
+    }
+
+    public void deleteAllusers() {
+        userRepository.deleteAll();
+        System.out.println("Db'ye kayıtlı tüm user bilgileri silindi.. ");
+    }
+
+    public void addUsers(List<User> users) {
+        User user;
+        for (int i = 0; i < users.size(); i++) {
+            user = userRepository.findOneByUserId(users.get(i).getUserId());
+            if (user == null) {
+                userRepository.save(users.get(i));
+            } else {
+                System.out.println(user.getUserId() + "Id'li kişi zaten Db'ye kayıtlı.");
+            }
+        }
+    }
+
+    public void getUserName(String name) {
+        List<User> users = userRepository.findOneByUserFirstNameIgnoreCase(name);
+        if (users.size() == 0) {
+            System.out.println("Aradiğiniz isimde bir kayıt bulunamadı.");
+        } else {
+            for (User s : users) {
+                System.out.println("User Id --> " + s.getUserId());
+                System.out.println("User Name --> " + s.getUserFirstName());
+                System.out.println("User Surname --> " + s.getUserLastName());
+                System.out.println("User Email --> " + s.getUserEmail());
+                System.out.println("User Department Name --> " + s.getUserDepartmentName());
+            }
+        }
+
     }
 }
