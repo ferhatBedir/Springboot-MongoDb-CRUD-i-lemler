@@ -13,6 +13,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+
     public void addUser(User user) {
         User user1 = userRepository.findOneByUserId(user.getUserId());
         if (user.getUserId() == null) {

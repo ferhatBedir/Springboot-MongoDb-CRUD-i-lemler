@@ -1,8 +1,6 @@
 package com.ferhat.springmongodemo.entity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.lang.Nullable;
-
 import javax.validation.constraints.Size;
 
 public class User {
