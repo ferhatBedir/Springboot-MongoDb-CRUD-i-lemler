@@ -4,7 +4,13 @@ package com.ferhat.springmongodemo.controller;
 import com.ferhat.springmongodemo.entity.User;
 import com.ferhat.springmongodemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,8 +21,13 @@ public class UserController {
 
 
     @PostMapping("/addUser")
-    public void addUser(@RequestBody User user) {
-        userService.addUser(user);
+    public void addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            System.out.println("User bilgileri hatalı. \nLütfen düzeltip tekrar deneyiniz.");
+        } else {
+            userService.addUser(user);
+        }
+
     }
 
     @GetMapping("/getUser")
@@ -30,8 +41,12 @@ public class UserController {
     }
 
     @PostMapping("/updateUser")
-    public void updateUser(@RequestBody User user) {
-        userService.updateUser(user);
+    public void updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            System.out.println("User bilgileri hatalı. \nLütfen düzeltip tekrar deneyiniz.");
+        } else {
+            userService.updateUser(user);
+        }
     }
 
     @GetMapping("/getAllUsers")
@@ -40,8 +55,10 @@ public class UserController {
     }
 
     @PostMapping("/addUsers")
-    public void addUsers(@RequestBody List<User> users) {
-        userService.addUsers(users);
+    public void addUsers(@RequestBody @Valid List<User> users, BindingResult bindingResult) {
+        for (User s : users) {
+            userService.addUser(s);
+        }
     }
 
     @DeleteMapping("/deleteAllUsers")

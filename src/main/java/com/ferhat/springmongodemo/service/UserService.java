@@ -18,8 +18,21 @@ public class UserService {
         User user1 = userRepository.findOneByUserId(user.getUserId());
         if (user.getUserId() == null) {
             System.out.println("User Id Alanının doldurulması zorunludur.. ");
+            System.out.println();
         } else if (user1 != null) {
             System.out.println("Kişi zaten Db'ye kayıtlı.. ");
+            System.out.println();
+        } else if (user.getUserFirstName().length() < 3 ||
+                user.getUserLastName().length() < 3 ||
+                user.getUserEmail().length() < 3 ||
+                user.getUserDepartmentName().length() < 2) {
+            System.out.println("Girilen veriler hatalı \nKontrol edip tekrar giriş yapınız.");
+            System.out.println("User name minimum 3 karakte olmalıdır !!");
+            System.out.println("User surname minimum 3 karakte olmalıdır !!");
+            System.out.println("User email minimum 3 karakte olmalıdır !!");
+            System.out.println("User department name minimum 3 karakte olmalıdır !!");
+            System.out.println("******************************************");
+            System.out.println();
         } else {
             userRepository.save(user);
             System.out.println("Kişi Db'ye kaydedildi.. ");
@@ -30,6 +43,7 @@ public class UserService {
             System.out.println("User Surname --> " + user.getUserLastName());
             System.out.println("User Email --> " + user.getUserEmail());
             System.out.println("User Department Name --> " + user.getUserDepartmentName());
+            System.out.println();
         }
     }
 
@@ -101,18 +115,6 @@ public class UserService {
     public void deleteAllusers() {
         userRepository.deleteAll();
         System.out.println("Db'ye kayıtlı tüm user bilgileri silindi.. ");
-    }
-
-    public void addUsers(List<User> users) {
-        User user;
-        for (int i = 0; i < users.size(); i++) {
-            user = userRepository.findOneByUserId(users.get(i).getUserId());
-            if (user == null) {
-                userRepository.save(users.get(i));
-            } else {
-                System.out.println(user.getUserId() + "Id'li kişi zaten Db'ye kayıtlı.");
-            }
-        }
     }
 
     public void getUserName(String name) {
