@@ -1,73 +1,77 @@
 package com.ferhat.springmongodemo.controller;
 
-
 import com.ferhat.springmongodemo.entity.User;
 import com.ferhat.springmongodemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
-    @Autowired
     private UserService userService;
 
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-    @PostMapping("/addUser")
-    public void addUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+    @PostMapping("/add")
+    public void add(@RequestBody @Valid User user,
+                    BindingResult bindingResult,
+                    HttpServletResponse httpServletResponse) throws IOException {
         if (bindingResult.hasErrors()) {
-            System.out.println("User bilgileri hatalı. \nLütfen düzeltip tekrar deneyiniz.");
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter is failud. \nPlease check parameters.");
         } else {
             userService.addUser(user);
         }
-
     }
 
-    @GetMapping("/getUser")
-    public void getUser(@RequestParam(value = "userId") Long id) {
-        userService.getUser(id);
+    @PostMapping("/addlist")
+    public void addList(@RequestBody List<User> users, HttpServletResponse httpServletResponse) throws IOException {
+        userService.addUserList(users, httpServletResponse);
     }
 
-    @DeleteMapping("/deleteUser")
-    public void deleteUser(@RequestParam(value = "userId") Long id) {
-        userService.deleteUser(id);
-    }
-
-    @PostMapping("/updateUser")
-    public void updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+    @PostMapping("edit")
+    public void edit(@RequestBody @Valid User user,
+                     BindingResult bindingResult,
+                     HttpServletResponse httpServletResponse) throws IOException {
         if (bindingResult.hasErrors()) {
-            System.out.println("User bilgileri hatalı. \nLütfen düzeltip tekrar deneyiniz.");
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter is failud. \nPlease check parameters.");
         } else {
-            userService.updateUser(user);
+            userService.editUser(user);
         }
     }
 
-    @GetMapping("/getAllUsers")
-    public void getAllUsers() {
-        userService.getAllUsers();
+    @GetMapping("/getuserbyid")
+    public User getUserById(@RequestParam(value = "userid") String userId) {
+        return userService.getUserByUserId(userId);
     }
 
-    @PostMapping("/addUsers")
-    public void addUsers(@RequestBody @Valid List<User> users, BindingResult bindingResult) {
-        for (User s : users) {
-            userService.addUser(s);
-        }
+    @GetMapping("/getuserbyname")
+    public List<User> getUserByName(@RequestParam(value = "username") String userName) {
+        return userService.getUserByUserName(userName);
     }
 
-    @DeleteMapping("/deleteAllUsers")
-    public void deleteAllUsers() {
-        userService.deleteAllusers();
+    @GetMapping("/getallusers")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
-    @GetMapping("/getUserName")
-    public void getUserName(@RequestParam(value = "userFirstName") String name) {
-        userService.getUserName(name);
+    @DeleteMapping("/delete")
+    public void delete(@RequestParam(value = "userid") String userId) {
+        userService.deleteUserByUserId(userId);
     }
+
+    @DeleteMapping("/deleteall")
+    public void deleteAll() {
+        userService.deleteAllUsers();
+    }
+
 }

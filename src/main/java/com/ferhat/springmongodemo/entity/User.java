@@ -1,63 +1,42 @@
 package com.ferhat.springmongodemo.entity;
 
+import lombok.Data;
 import org.springframework.data.annotation.Id;
+
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@Data
 public class User {
 
     @Id
-    private Long userId;
+    private String userId;
 
-    @Size(max = 40, min = 3)
+    @NotNull
+    @Size(min = 3, max = 40)
     private String userFirstName;
 
-    @Size(max = 40, min = 3)
+    @NotNull
+    @Size(min = 3, max = 40)
     private String userLastName;
 
-    @Size(max = 40, min = 3)
-    private String userEmail;
+    @NotNull
+    @Size(min = 7, max = 11)
+    private String userIdentityNumber;
 
-    @Size(max = 40, min = 2)
-    private String userDepartmentName;
+    @NotNull
+    @Size(min = 3, max = 40)
+    private String userNationality;
+
+    @NotNull
+    private Integer userAge;
+
+    @NotNull
+    @Size(min = 7, max = 11)
+    private String userPhoneNum;
 
 
-    public Long getUserId() {
-        return userId;
-    }
+    private UserJobInformation userJobInfo;
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUserFirstName() {
-        return userFirstName;
-    }
-
-    public void setUserFirstName(String userFirstName) {
-        this.userFirstName = userFirstName;
-    }
-
-    public String getUserLastName() {
-        return userLastName;
-    }
-
-    public void setUserLastName(String userLastName) {
-        this.userLastName = userLastName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
-    public String getUserDepartmentName() {
-        return userDepartmentName;
-    }
-
-    public void setUserDepartmentName(String userDepartmentName) {
-        this.userDepartmentName = userDepartmentName;
-    }
+    private UserWorkExperience userWorkExperience;
 }

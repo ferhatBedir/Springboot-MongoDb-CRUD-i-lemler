@@ -1,135 +1,115 @@
 package com.ferhat.springmongodemo.service;
 
 import com.ferhat.springmongodemo.entity.User;
+import com.ferhat.springmongodemo.repository.UserJobInformationRepository;
 import com.ferhat.springmongodemo.repository.UserRepository;
+import com.ferhat.springmongodemo.repository.UserWorkExperienceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.SmartValidator;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
+    private SmartValidator smartValidator;
+    private UserJobInformationRepository userJobInfo;
+    private UserWorkExperienceRepository userWorkExperienceRepository;
 
+    @Autowired
+    public UserService(UserRepository userRepository,
+                       SmartValidator smartValidator,
+                       UserJobInformationRepository userJobInfo,
+                       UserWorkExperienceRepository userWorkExperienceRepository) {
+        this.userRepository = userRepository;
+        this.smartValidator = smartValidator;
+        this.userJobInfo = userJobInfo;
+        this.userWorkExperienceRepository = userWorkExperienceRepository;
+    }
 
-    public void addUser(User user) {
-        User user1 = userRepository.findOneByUserId(user.getUserId());
-        if (user.getUserId() == null) {
-            System.out.println("User Id Alanının doldurulması zorunludur.. ");
-            System.out.println();
-        } else if (user1 != null) {
-            System.out.println("Kişi zaten Db'ye kayıtlı.. ");
-            System.out.println();
-        } else if (user.getUserFirstName().length() < 3 ||
-                user.getUserLastName().length() < 3 ||
-                user.getUserEmail().length() < 3 ||
-                user.getUserDepartmentName().length() < 2) {
-            System.out.println("Girilen veriler hatalı \nKontrol edip tekrar giriş yapınız.");
-            System.out.println("User name minimum 3 karakte olmalıdır !!");
-            System.out.println("User surname minimum 3 karakte olmalıdır !!");
-            System.out.println("User email minimum 3 karakte olmalıdır !!");
-            System.out.println("User department name minimum 3 karakte olmalıdır !!");
-            System.out.println("******************************************");
-            System.out.println();
+    public void addUser(User newUser) {
+        User user = userRepository.findByUserId(newUser.getUserId());
+        if (user == null) {
+            userRepository.save(newUser);
+            System.out.println("User registered to Database.");
+        } else {
+            System.out.println("User already registered to Database.");
+        }
+    }
+
+    public void addUserList(List<User> users, HttpServletResponse httpServletResponse) throws IOException {
+        if (users == null) {
+            System.out.println("List not must be empty !");
+        }
+        for (User temp : users) {
+            checkData(temp, httpServletResponse);
+        }
+    }
+
+    public void editUser(User newUser) {
+        User user = userRepository.findByUserId(newUser.getUserId());
+        if (user != null) {
+            user.setUserFirstName(newUser.getUserFirstName());
+            user.setUserLastName(newUser.getUserLastName());
+            user.setUserAge(newUser.getUserAge());
+            user.setUserPhoneNum(newUser.getUserPhoneNum());
+            user.setUserIdentityNumber(newUser.getUserIdentityNumber());
+            user.setUserNationality(newUser.getUserNationality());
+            user.setUserJobInfo(newUser.getUserJobInfo());
+            user.setUserWorkExperience(newUser.getUserWorkExperience());
+
+            userRepository.save(user);
+            System.out.println("User updated.");
+        } else {
+            System.out.println("User not found in database.");
+        }
+    }
+
+    public User getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId);
+    }
+
+    public List<User> getUserByUserName(String userName) {
+        return userRepository.findOneByUserFirstNameIgnoreCase(userName);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void deleteUserByUserId(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user != null) {
+            userRepository.delete(user);
+        } else {
+            System.out.println("User not found in database.");
+        }
+    }
+
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
+        System.out.println("All users deleted.");
+    }
+
+    private void checkData(User user, HttpServletResponse httpServletResponse) throws IOException {
+        DataBinder binder = new DataBinder(user);
+        binder.setValidator(smartValidator);
+        binder.validate();
+        BindingResult bindingResult = binder.getBindingResult();
+
+        if (bindingResult.hasErrors()) {
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter is failure.");
         } else {
             userRepository.save(user);
-            System.out.println("Kişi Db'ye kaydedildi.. ");
-            System.out.println("******************************************");
-            System.out.println("Kayıt Edilen Kişi Bilgileri");
-            System.out.println("User Id --> " + user.getUserId());
-            System.out.println("User Name --> " + user.getUserFirstName());
-            System.out.println("User Surname --> " + user.getUserLastName());
-            System.out.println("User Email --> " + user.getUserEmail());
-            System.out.println("User Department Name --> " + user.getUserDepartmentName());
-            System.out.println();
+            System.out.println("User registered to Database.");
         }
     }
 
-    public void getUser(Long id) {
-        User user = userRepository.findOneByUserId(id);
-        if (user == null) {
-            throw new NullPointerException("Db'de " + id + "Id'li kayıt bulunamadı.. ");
-        } else {
-            System.out.println("******************************************");
-            System.out.println("Kişi Bilgileri");
-            System.out.println("User Id --> " + user.getUserId());
-            System.out.println("User Name --> " + user.getUserFirstName());
-            System.out.println("User Surname --> " + user.getUserLastName());
-            System.out.println("User Email --> " + user.getUserEmail());
-            System.out.println("User Department Name --> " + user.getUserDepartmentName());
-        }
-    }
 
-    public void deleteUser(Long id) {
-        User user = userRepository.findOneByUserId(id);
-        if (user == null) {
-            throw new NullPointerException("Db'de " + id + "Id'li kayıt bulunamadı.. ");
-        } else {
-            userRepository.delete(user);
-            System.out.println("Kişi Bilgileri Db'den silindi..");
-        }
-    }
-
-    public void updateUser(User user) {
-        User userTemp = userRepository.findOneByUserId(user.getUserId());
-        if (userTemp == null) {
-            throw new NullPointerException("Db'de " + user.getUserId() + "Id'li kayıt bulunamadı.. ");
-        } else {
-            userTemp.setUserFirstName(user.getUserFirstName());
-            userTemp.setUserLastName(user.getUserLastName());
-            userTemp.setUserEmail(user.getUserEmail());
-            userTemp.setUserDepartmentName(user.getUserDepartmentName());
-            userRepository.save(userTemp);
-            System.out.println("Kişi Bilgileri Güncellendi ve Db'ye kaydedildi.. ");
-            System.out.println("******************************************");
-            System.out.println("Güncellenen Kişi Bilgileri");
-            System.out.println("User Id --> " + userTemp.getUserId());
-            System.out.println("User Name --> " + userTemp.getUserFirstName());
-            System.out.println("User Surname --> " + userTemp.getUserLastName());
-            System.out.println("User Email --> " + userTemp.getUserEmail());
-            System.out.println("User Department Name --> " + userTemp.getUserDepartmentName());
-        }
-    }
-
-    public void getAllUsers() {
-        List<User> users = userRepository.findAll();
-        System.out.println("Kayıtlı Kişi Listesi");
-        if (users.size() == 0) {
-            System.out.println("Db'ye kayıtlı kişi yok..");
-        } else {
-            for (User s : users) {
-                System.out.println("******************************************");
-                System.out.println("Kişi Bilgileri");
-                System.out.println("User Id --> " + s.getUserId());
-                System.out.println("User Name --> " + s.getUserFirstName());
-                System.out.println("User Surname --> " + s.getUserLastName());
-                System.out.println("User Email --> " + s.getUserEmail());
-                System.out.println("User Department Name --> " + s.getUserDepartmentName());
-            }
-        }
-
-    }
-
-    public void deleteAllusers() {
-        userRepository.deleteAll();
-        System.out.println("Db'ye kayıtlı tüm user bilgileri silindi.. ");
-    }
-
-    public void getUserName(String name) {
-        List<User> users = userRepository.findOneByUserFirstNameIgnoreCase(name);
-        if (users.size() == 0) {
-            System.out.println("Aradiğiniz isimde bir kayıt bulunamadı.");
-        } else {
-            for (User s : users) {
-                System.out.println("User Id --> " + s.getUserId());
-                System.out.println("User Name --> " + s.getUserFirstName());
-                System.out.println("User Surname --> " + s.getUserLastName());
-                System.out.println("User Email --> " + s.getUserEmail());
-                System.out.println("User Department Name --> " + s.getUserDepartmentName());
-            }
-        }
-
-    }
 }
