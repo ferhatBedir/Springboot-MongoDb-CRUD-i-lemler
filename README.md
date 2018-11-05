@@ -12,3 +12,12 @@
   
   * The application.properties file is below. If your setting are different, change from the application.properties file.
   
+        spring.data.mongodb.host=localhost
+        spring.data.mongodb.port=27017
+        spring.data.mongodb.database=example
+        
+ * For example : Request Body
+ 
+        {
+        
+        }
