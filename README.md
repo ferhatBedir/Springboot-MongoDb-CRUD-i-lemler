@@ -28,12 +28,14 @@
         }
         
      Send Post Request;
+     
      Address : http://localhost:8080/user/add
      
 
  * For Example :
 
      Send Get Request;
+     
      Address : http://localhost:8080/user/getuserbyid?userid=1
      
  
